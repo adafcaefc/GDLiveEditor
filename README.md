@@ -1,4 +1,5 @@
 # GDLiveEditor
 
-Warning: Bad and messy code.
-My C++ skills is kinda bad.
+Load level string live into editor!
+
+Warning: bad and messy code because C++ skill is kinda bad.
