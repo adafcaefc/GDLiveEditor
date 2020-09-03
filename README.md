@@ -1,4 +1,4 @@
 # GDLiveEditor
 
 Warning: Bad and messy code.
-My c++ skills is kinda bad.
+My C++ skills is kinda bad.
