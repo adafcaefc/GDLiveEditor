@@ -58,10 +58,7 @@ def main() -> None:
 	global DRAW_SCALE, THRESHOLD, TOLERANCE, CHROMA_KEY
 
 	parsed_json = json.loads(
-		open(
-			input("JSON file name:"), 'r'
-		).read()
-	)
+		open(input("Enter your geometrize JSON file name "), 'r').read())
 
 	convert_json_to_gd_object_list(parsed_json)
 
