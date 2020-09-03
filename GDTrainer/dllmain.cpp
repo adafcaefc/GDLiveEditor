@@ -1,5 +1,61 @@
 #include <Windows.h>
 #include <iostream>
+#include <string>
+#include <chrono>
+#include <thread>
+
+typedef void(__stdcall* fPasteFunction)(std::string testString);
+
+void pipeMain() {
+	char buffer[1024];
+	DWORD dwRead;
+	HANDLE hPipe;
+	hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\GDPipe"),
+		PIPE_ACCESS_DUPLEX,
+		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+		1,
+		1024 * 15,
+		1024 * 15,
+		NMPWAIT_USE_DEFAULT_WAIT,
+		NULL);
+
+	while (hPipe != INVALID_HANDLE_VALUE)
+	{
+		if (ConnectNamedPipe(hPipe, NULL) != FALSE)   // wait for someone to connect to the pipe
+		{
+			while (ReadFile(hPipe, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
+			{
+				/* add terminating zero */
+				buffer[dwRead] = '\0';
+
+				/* do something with data in buffer */
+				DWORD oldProtect, newProtect;
+
+				DWORD base = (DWORD)GetModuleHandleA(0);
+				DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
+
+				fPasteFunction pasteFunction = (fPasteFunction)(base + 0x88240);
+
+				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000026DE9;
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::string objectString = buffer;
+
+
+				pasteFunction(objectString);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000958638;
+
+				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, oldProtect, &newProtect);
+			}
+		}
+
+		DisconnectNamedPipe(hPipe);
+	}
+}
+
 
 void placeJump(BYTE* address, DWORD jumpTo, DWORD length)
 {
@@ -143,6 +199,7 @@ DWORD WINAPI mainMod(LPVOID lpParam)
 	loadPointer();
 	placeJump((BYTE*)base + 0x190BD0, (DWORD)showTrainerButton, 0x5);
 	placeJump((BYTE*)base + 0x88240, (DWORD)pasteObjects, 0x5);
+	CreateThread(0, 0x1000, (LPTHREAD_START_ROUTINE)pipeMain, 0, 0, NULL);
 	return 1;
 }
 

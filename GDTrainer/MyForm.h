@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <Windows.h>
 #include <string>
 #include <chrono>
@@ -7,7 +8,6 @@
 #include <msclr\marshal_cppstd.h>
 
 typedef void(__stdcall* fPasteFunction)(std::string testString);
-
 
 namespace GDTrainer {
 
