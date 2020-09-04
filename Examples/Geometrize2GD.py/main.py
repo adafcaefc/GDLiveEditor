@@ -87,6 +87,7 @@ def main() -> None:
 		), " "))
 
 		json_file = False
+		
 		while not json_file:
 			json_path = input(" ")
 			try:
@@ -96,15 +97,15 @@ def main() -> None:
 					json_file = open(json_path + '.json', 'r').read()
 				except:
 					clear_line(2)
+
 					print(indent(dedent(
 						f'''
 						{Fore.RED}File not found!{Fore.GREEN}
 						'''
 					), " "))
+
 					sleep(1)
 					clear_line(2)
-
-
 
 		parsed_json = json.loads(json_file)
 
@@ -145,15 +146,9 @@ def main() -> None:
 			TOLERANCE = input(" ")
 
 			clear_line(4)
-
-
 		
 		draw_json_to_gd(parsed_json, is_opaque)
 
-
-		
-
-		
 
 
 def clear_line(number_of_lines: int) -> None:
