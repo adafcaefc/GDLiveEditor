@@ -4,11 +4,13 @@ Load level string live into the Geometry Dash editor!
 
 Special thanks to:
 
-Camden314 https://github.com/camden314/GraphicsGD2
+Camden314 https://github.com/camden314/
 
-nekit https://github.com/NeKitDS/gd.py
+nekit https://github.com/NeKitDS/
 
-Spu7nix https://github.com/Spu7Nix/HOW-sources
+Spu7nix https://github.com/Spu7Nix/
+
+WEGFan https://github.com/WEGFan
 
 for without their codes example, this project would be imposibble.
 

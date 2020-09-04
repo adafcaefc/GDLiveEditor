@@ -4,9 +4,8 @@ from gd_object_dict import OBJECT_DICTIONARY
 class gd_object:
 
 	def __init__(self, **kwargs):
-		self.dict = {}
-		for i in kwargs: self.dict[i] = kwargs[i]
-
+		self.dict = kwargs
+		
 	def __str__(self):
 		object_string = []
 		for i in self.dict:
