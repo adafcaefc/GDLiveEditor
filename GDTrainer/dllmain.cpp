@@ -5,9 +5,13 @@
 #include <thread>
 
 typedef void(__stdcall* fPasteFunction)(std::string testString);
+// typedef void(__stdcall* fNormalFunction)();
+
+DWORD base = (DWORD)GetModuleHandleA(0);
+DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
+
 
 void pipeMain() {
-
 	char buffer[1024];
 	DWORD dwRead;
 	HANDLE hPipe;
@@ -15,7 +19,7 @@ void pipeMain() {
 		TEXT("\\\\.\\pipe\\GDPipe"),
 		PIPE_ACCESS_DUPLEX,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-		1,
+		8,
 		1024 * 16,
 		1024 * 16,
 		NMPWAIT_USE_DEFAULT_WAIT,
@@ -26,35 +30,44 @@ void pipeMain() {
 	{
 		if (ConnectNamedPipe(hPipe, NULL) != FALSE)   // wait for someone to connect to the pipe
 		{
-			std::string objectString = "";
 
 			while (ReadFile(hPipe, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
 			{
 				/* add terminating zero */
 				buffer[dwRead] = '\0';
 
-				objectString = objectString + buffer;
+				// objectString = objectString + buffer;
+
+				std::string objectString = buffer;
+
+				/* do something with data in buffer */
+				DWORD oldProtect, newProtect;
+
+				fPasteFunction pasteFunction = (fPasteFunction)(base + 0x88240);
+				// fNormalFunction messageBox = (fNormalFunction)(base + 0x25D440);
+
+				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, PAGE_EXECUTE_READWRITE, &oldProtect);
+				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000026DE9;
+
+				// VirtualProtect((LPVOID)(libcocosbase + 0xFF410), 1024, PAGE_EXECUTE_READWRITE, &oldProtect);
+				// *((BYTE*)(libcocosbase + 0xFF410)) = 0xC3;
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+				pasteFunction(objectString);
+				// messageBox();
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+				// *((BYTE*)(libcocosbase + 0xFF410)) = 0x55;
+				// VirtualProtect((LPVOID)(libcocosbase + 0xFF410), 1, oldProtect, &newProtect);
+
+
+				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000958638;
+				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, oldProtect, &newProtect);
 
 			}
 
-			/* do something with data in buffer */
-			DWORD oldProtect, newProtect;
-
-			DWORD base = (DWORD)GetModuleHandleA(0);
-			DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
-			fPasteFunction pasteFunction = (fPasteFunction)(base + 0x88240);
-
-			VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, PAGE_EXECUTE_READWRITE, &oldProtect);
-			*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000026DE9;
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			pasteFunction(objectString);
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-			*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000958638;
-
-			VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, oldProtect, &newProtect);
 		}
 
 		DisconnectNamedPipe(hPipe);
@@ -106,14 +119,11 @@ void showMainTrainer()
 
 }
 
-DWORD base = (DWORD)GetModuleHandleA(0);
-DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
-DWORD createWithSprite = base + 0x282284; // USE AS A POINTER
+DWORD createWithSprite = base + 0x282284; // USED AS A POINTER
 DWORD createWithSprite_ = (DWORD)createWithSprite;
-DWORD operatorPlus = base + 0x282278; // USE AS A POINTER
+DWORD operatorPlus = base + 0x282278; // USED AS A POINTER
 DWORD operatorPlus_ = (DWORD)operatorPlus;
-DWORD sharedDirector = base + 0x282270; // USE AS A POINTER
+DWORD sharedDirector = base + 0x282270; // USED AS A POINTER
 DWORD sharedDirector_ = (DWORD)sharedDirector;
 
 DWORD getString = base + 0xF840;

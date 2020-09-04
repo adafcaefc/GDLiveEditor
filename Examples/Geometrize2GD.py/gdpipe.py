@@ -1,9 +1,9 @@
 import win32file
 from typing import Any, Iterator
-
+import time
 
 PIPE_NAME = '\\\\.\\pipe\\GDPipe'
-CHUNK_SIZE = 100
+CHUNK_SIZE = 5
 
 
 def chunks(object_list: list, size: int) -> Iterator[Any]:
@@ -26,3 +26,4 @@ def draw_object(level_object) -> None:
 	for object_list in chunks(level_object.block_data, CHUNK_SIZE):
 		object_string = ';'.join([str(x) for x in object_list]) + ';'
 		win32file.WriteFile(handle, object_string.encode())
+		time.sleep(0.05)
