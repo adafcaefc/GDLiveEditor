@@ -1,9 +1,19 @@
+import json
+
 from colorsys import rgb_to_hsv
 from typing import Any, Dict, List
-import json
-from gdlevel import gd_object_collection
-from gdpipe import draw_object
 
+import colorama
+from colorama import Fore, Style, Cursor
+
+from textwrap import indent, dedent
+
+from gd_object import gd_object_collection
+from gd_pipe import draw_object
+
+__program_name__ = 'Geometrize2GD.py'
+__author__ = 'Adafcaefc'
+__version__ = '1.0.0'
 
 DRAW_SCALE = 1
 CIRCLE_TYPE = [32, 5]
@@ -15,7 +25,7 @@ CHROMA_KEY = [0,0,0]
 OBJECT_LIST = gd_object_collection()
 
 
-def convert_json_to_gd_object_list(parsed_json: Dict[str, Any], opaque: bool=True) -> List:
+def draw_json_to_gd(parsed_json: Dict[str, Any], opaque: bool=True) -> List:
 
 	z_order = 0
 
@@ -31,9 +41,7 @@ def convert_json_to_gd_object_list(parsed_json: Dict[str, Any], opaque: bool=Tru
 			) or opaque:
 
 				(x, y, scale, *_), (r, g, b, *_) = shape["data"], shape["color"]
-
 				h, s, v = rgb_to_hsv(r / 255, g / 255, b / 255)
-
 				hsv_string = f'{h * 360}a{s}a{v}a1a1'
 
 				OBJECT_LIST.add_block (
@@ -55,13 +63,58 @@ def convert_json_to_gd_object_list(parsed_json: Dict[str, Any], opaque: bool=Tru
 
 def main() -> None:
 
-	global DRAW_SCALE, THRESHOLD, TOLERANCE, CHROMA_KEY
+	global DRAW_SCALE, THRESHOLD, TOLERANCE, CHROMA_KEY, OBJECT_LIST
+	
+	print(indent(dedent(
+		f'''
+		{Fore.CYAN}{__program_name__} v{__version__} by {__author__}
+		{Fore.MAGENTA}Have fun!
 
-	parsed_json = json.loads(
-		open(input("Enter your geometrize JSON file name "), 'r').read())
+		{Fore.RED}NOT FOR PUBLIC USE!'''
+	), " "))
 
-	convert_json_to_gd_object_list(parsed_json)
+	while True:
+
+		OBJECT_LIST = gd_object_collection()
+
+		print(indent(dedent(
+			f'''
+			{Fore.YELLOW}Enter your geometrize JSON file name{Fore.GREEN}
+			'''
+		), " "))
+		
+		json_path = input(" ")
+
+		try:
+			json_file = open(json_path, 'r').read()
+		except:
+			json_file = open(json_path + '.json', 'r').read()
+
+		parsed_json = json.loads(json_file)
+
+		clear_line(4)
+
+		print(indent(dedent(
+			f'''
+			{Fore.YELLOW}Enter image scale{Fore.GREEN}
+			'''
+		), " "))
+
+		DRAW_SCALE = 1 / float(input(" "))
+
+		clear_line(4)
+
+		draw_json_to_gd(parsed_json)
+
+
+def clear_line(num):
+
+  print((Cursor.UP() + colorama.ansi.clear_line()) * num, end='')
 
 
 if __name__ == '__main__':
+
+	colorama.init(autoreset=False)
+	print(Style.BRIGHT, end='')
+
 	main()

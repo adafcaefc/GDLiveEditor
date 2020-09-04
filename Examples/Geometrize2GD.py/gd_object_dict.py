@@ -1,4 +1,4 @@
-ITEM_DICTIONARY = {
+OBJECT_DICTIONARY = {
 	'ID': 1,
 	'X': 2,
 	'Y': 3,

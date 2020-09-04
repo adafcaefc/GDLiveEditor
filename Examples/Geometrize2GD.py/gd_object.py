@@ -1,4 +1,4 @@
-from gddict import ITEM_DICTIONARY
+from gd_object_dict import OBJECT_DICTIONARY
 
 
 class gd_object:
@@ -10,7 +10,7 @@ class gd_object:
 	def __str__(self):
 		object_string = []
 		for i in self.dict:
-			object_string.append(str(ITEM_DICTIONARY[i]))
+			object_string.append(str(OBJECT_DICTIONARY[i]))
 			object_string.append(str(self.dict[i]))
 		return (','.join(object_string))
 
