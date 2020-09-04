@@ -4,18 +4,20 @@
 
 # GDLiveEditor
 
-Load level string live into the Geometry Dash editor!
+**Load level string live into the Geometry Dash editor!**
 
-Special thanks to:
+----
 
-Camden314 https://github.com/camden314/
+**GDLiveEditor** is a project built to provide Geometry Dash editor mode with external program support via pipe. This project is originally started by [Camden314](https://github.com/camden314/) on MACOSX and ported to Windows by me. This project includes some example with codes based on [nekit](https://github.com/NeKitDS/), [Spu7nix](https://github.com/Spu7Nix/), [WEGFan](https://github.com/WEGFan)'s previous works.
 
-nekit https://github.com/NeKitDS/
+## Special thanks
 
-Spu7nix https://github.com/Spu7Nix/
+[Camden314](https://github.com/camden314/)
 
-WEGFan https://github.com/WEGFan
+[nekit](https://github.com/NeKitDS/)
 
-for without their codes example, this project would be imposibble.
+[Spu7nix](https://github.com/Spu7Nix/)
+
+[WEGFan](https://github.com/WEGFan)
 
 Warning: bad and messy code because C++ skill is kinda bad because this is my first real C++ project.
