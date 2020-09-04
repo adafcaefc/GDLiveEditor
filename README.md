@@ -6,7 +6,7 @@ Special thanks to:
 
 Camden314 https://github.com/camden314/GraphicsGD2
 
-NeKitDs https://github.com/NeKitDS/gd.py
+nekit https://github.com/NeKitDS/gd.py
 
 Spu7nix https://github.com/Spu7Nix/HOW-sources
 
