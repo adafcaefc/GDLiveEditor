@@ -37,15 +37,15 @@ def convert_json_to_gd_object_list(parsed_json: Dict[str, Any], opaque: bool=Tru
 				hsv_string = f'{h * 360}a{s}a{v}a1a1'
 
 				OBJECT_LIST.add_block (
-						block_id = CIRCLE_ID, 
-						x_position = x / DRAW_SCALE, 
-						y_position = y / DRAW_SCALE, 
-						size = scale / DRAW_SCALE / 4, 
-						hsv_enabled_1 = 1, 
-						hsv_enabled_2 = 2, 
-						hsv_values_1 = hsv_string, 
-						hsv_values_2 = hsv_string, 
-						z_order = z_order
+						ID = CIRCLE_ID, 
+						X = x / DRAW_SCALE, 
+						Y = y / DRAW_SCALE, 
+						SCALE = scale / DRAW_SCALE / 4, 
+						COLOR_1_HSV_ENABLED = 1, 
+						COLOR_2_HSV_ENABLED = 1, 
+						COLOR_1_HSV_VALUES = hsv_string, 
+						COLOR_2_HSV_VALUES = hsv_string, 
+						Z_ORDER = z_order
 					)
 
 				z_order += 1
