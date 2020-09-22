@@ -22,7 +22,7 @@ def chunks(object_list: list, size: int) -> Iterator[Any]:
 		
 def draw_object(level_object) -> None:
 
-	handle = win32file.CreateFile (PIPE_NAME, win32file.GENERIC_READ | win32file.GENERIC_WRITE, 0, None, win32file.OPEN_EXISTING, 0, None)
+	handle = win32file.CreateFile(PIPE_NAME, win32file.GENERIC_READ | win32file.GENERIC_WRITE, 0, None, win32file.OPEN_EXISTING, 0, None)
 
 	blocks_drawn = 0
 
