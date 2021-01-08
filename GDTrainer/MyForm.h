@@ -1,6 +1,5 @@
 #pragma once
 #include "includes.h"
-#include <msclr\marshal_cppstd.h>
 
 namespace GDTrainer {
 
