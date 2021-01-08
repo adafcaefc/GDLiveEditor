@@ -1,13 +1,6 @@
 #pragma once
-
-
-#include <Windows.h>
-#include <string>
-#include <chrono>
-#include <thread>
+#include "includes.h"
 #include <msclr\marshal_cppstd.h>
-
-typedef void(__stdcall* fPasteFunction)(std::string testString);
 
 namespace GDTrainer {
 
@@ -111,27 +104,9 @@ namespace GDTrainer {
 		}
 #pragma endregion
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-
-		DWORD oldProtect, newProtect;
-
-		DWORD base = (DWORD)GetModuleHandleA(0);
-		DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
-		fPasteFunction pasteFunction = (fPasteFunction)(base + 0x88240);
-
-		VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, PAGE_EXECUTE_READWRITE, &oldProtect);
-		*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000026DE9;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		msclr::interop::marshal_context context;
 		std::string objectString = context.marshal_as<std::string>(textBox1->Text);
-		pasteFunction(objectString);
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-		*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000958638;
-
-		VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, oldProtect, &newProtect);
-
+		safePaste(objectString);
 	}
 	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
 	}

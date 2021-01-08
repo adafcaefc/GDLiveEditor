@@ -1,170 +1,40 @@
-#include <Windows.h>
+#include "includes.h"
 #include <iostream>
-#include <string>
-#include <chrono>
-#include <thread>
-
-typedef void(__stdcall* fPasteFunction)(std::string testString);
-// typedef void(__stdcall* fNormalFunction)();
-
-DWORD base = (DWORD)GetModuleHandleA(0);
-DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
-
-void pipeMain() {
-	char buffer[1024];
-	DWORD dwRead;
-	HANDLE hPipe;
-	hPipe = CreateNamedPipe(
-		TEXT("\\\\.\\pipe\\GDPipe"),
-		PIPE_ACCESS_DUPLEX,
-		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-		8,
-		1024 * 16,
-		1024 * 16,
-		NMPWAIT_USE_DEFAULT_WAIT,
-		NULL
-	);
-
-	while (hPipe != INVALID_HANDLE_VALUE)
-	{
-		if (ConnectNamedPipe(hPipe, NULL) != FALSE)   // wait for someone to connect to the pipe
-		{
-
-			while (ReadFile(hPipe, buffer, sizeof(buffer) - 1, &dwRead, NULL) != FALSE)
-			{
-				/* add terminating zero */
-				buffer[dwRead] = '\0';
-
-				// objectString = objectString + buffer;
-
-				std::string objectString = buffer;
-
-				/* do something with data in buffer */
-				DWORD oldProtect, newProtect;
-
-				fPasteFunction pasteFunction = (fPasteFunction)(base + 0x88240);
-				// fNormalFunction messageBox = (fNormalFunction)(base + 0x25D440);
-
-				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, PAGE_EXECUTE_READWRITE, &oldProtect);
-				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000026DE9;
-
-				// VirtualProtect((LPVOID)(libcocosbase + 0xFF410), 1024, PAGE_EXECUTE_READWRITE, &oldProtect);
-				// *((BYTE*)(libcocosbase + 0xFF410)) = 0xC3;
-
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
-				pasteFunction(objectString);
-				// messageBox();
-
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
-				// *((BYTE*)(libcocosbase + 0xFF410)) = 0x55;
-				// VirtualProtect((LPVOID)(libcocosbase + 0xFF410), 1, oldProtect, &newProtect);
-
-
-				*((__int64*)(libcocosbase + 0xC16A3)) = 0x0E74000000958638;
-				VirtualProtect((LPVOID)(libcocosbase + 0xC16A3), 8, oldProtect, &newProtect);
-
-			}
-
-		}
-
-		DisconnectNamedPipe(hPipe);
-	}
-}
-
-void placeJump(BYTE* address, DWORD jumpTo, DWORD length)
-{
-	DWORD oldProtect, newProtect, relativeAddress;
-	VirtualProtect(address, length, PAGE_EXECUTE_READWRITE, &oldProtect);
-	relativeAddress = (DWORD)(jumpTo - (DWORD)address) - 5;
-	*address = 0xE9;
-	*((DWORD*)(address + 0x1)) = relativeAddress;
-	for (DWORD x = 0x5; x < length; x++)
-	{
-		*(address + x) = 0x90;
-	}
-	VirtualProtect(address, length, oldProtect, &newProtect);
-}
-
-void writeByte(BYTE* address, BYTE content)
-{
-	DWORD oldProtect, newProtect;
-	VirtualProtect(address, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
-	*address = content;
-	VirtualProtect(address, 1, oldProtect, &newProtect);
-}
 
 extern int Main();
-BOOL isTrainerOpen = false;
+void showMainTrainer();
+DWORD WINAPI showMainTrainerThread(LPVOID lpParam);
 
-DWORD WINAPI showMainTrainerThread(LPVOID lpParam)
-{
-	if (not isTrainerOpen) {
+uintptr_t base = getBase();
+uintptr_t libcocosbase = getBase("libcocos2d.dll");
+uintptr_t createWithSprite = *(uintptr_t*)(base + 0x282284); // USED AS A POINTER
+uintptr_t operatorPlus = *(uintptr_t*)(base + 0x282278);
+uintptr_t sharedDirector = *(uintptr_t*)(base + 0x282270);
+uintptr_t getString = base + 0xF840;
+uintptr_t createMenu = base + 0x18EE0;
+uintptr_t showMain = (uintptr_t)showMainTrainer;
+uintptr_t retShowTrainerButton = base + 0x190BD5;
+uintptr_t varShowTrainerButton = base + 0x2CD6D4;
+char showTrainerButtonSpriteChar[] = "GJ_editBtn_001.png";
+uintptr_t showTrainerButtonSprite = (uintptr_t)showTrainerButtonSpriteChar;
+
+BOOL isTrainerOpen = false;
+DWORD WINAPI showMainTrainerThread(LPVOID lpParam) {
+	if (!isTrainerOpen) {
 		isTrainerOpen = true;
 		Main();
+		isTrainerOpen = false;
 	}
-	else {
-		return 1;
-	}
-	isTrainerOpen = false;
-	return 1;
+	return TRUE;
 }
 
-void showMainTrainer()
-{
+void showMainTrainer() {
 	CreateThread(0, 0x1000, (LPTHREAD_START_ROUTINE)showMainTrainerThread, 0, 0, NULL);
 	__asm ret 0x4
-
-}
-
-DWORD createWithSprite = base + 0x282284; // USED AS A POINTER
-DWORD createWithSprite_ = (DWORD)createWithSprite;
-DWORD operatorPlus = base + 0x282278; // USED AS A POINTER
-DWORD operatorPlus_ = (DWORD)operatorPlus;
-DWORD sharedDirector = base + 0x282270; // USED AS A POINTER
-DWORD sharedDirector_ = (DWORD)sharedDirector;
-
-DWORD getString = base + 0xF840;
-DWORD createMenu = base + 0x18EE0;
-DWORD showMain = (DWORD)showMainTrainer;
-DWORD retShowTrainerButton = base + 0x190BD5;
-DWORD varShowTrainerButton = base + 0x2CD6D4;
-char showTrainerButtonSpriteChar[] = "GJ_editBtn_001.png";
-DWORD showTrainerButtonSprite = (DWORD)showTrainerButtonSpriteChar;
-
-DWORD gameManager = base + 0x3222D0;
-
-DWORD retPasteObjects = base + 0x88245;
-
-__declspec(naked) void pasteObjects() {
-
-	__asm {
-
-		mov ecx, gameManager
-		mov ecx, [ecx]
-		add ecx, 0x168
-		mov ecx, [ecx]
-		test ecx, ecx
-		je return_end
-		add ecx, 0x380
-		mov ecx, [ecx]
-		test ecx, ecx
-		je return_end
-		push ebp
-		mov ebp, esp
-		push -0x01
-		jmp[retPasteObjects]
-		return_end:
-		ret 0x0018
-	}
 }
 
 __declspec(naked) void showTrainerButton() {
-
 	__asm {
-
 		push showTrainerButtonSprite
 		call dword ptr[createWithSprite]
 		mov esi, eax
@@ -184,43 +54,17 @@ __declspec(naked) void showTrainerButton() {
 		call dword ptr[edx + 0x000000E0]
 		push varShowTrainerButton
 		jmp[retShowTrainerButton]
-
 	}
 }
 
-__declspec(naked) void loadPointer() {
-
-	__asm {
-
-		pushad
-		mov eax, createWithSprite_
-		mov eax, [eax]
-		mov[createWithSprite], eax
-		mov eax, operatorPlus_
-		mov eax, [eax]
-		mov[operatorPlus], eax
-		mov eax, sharedDirector_
-		mov eax, [eax]
-		mov[sharedDirector], eax
-		popad
-		ret
-
-	}
+DWORD WINAPI mainMod(LPVOID lpParam) {
+	placeJump(base + 0x190BD0, reinterpret_cast<uintptr_t>(showTrainerButton), 0x5);
+	pipeMain("\\\\.\\pipe\\GDPipe");
+	return TRUE;
 }
 
-DWORD WINAPI mainMod(LPVOID lpParam)
-{
-	loadPointer();
-	placeJump((BYTE*)base + 0x190BD0, (DWORD)showTrainerButton, 0x5);
-	placeJump((BYTE*)base + 0x88240, (DWORD)pasteObjects, 0x5);
-	CreateThread(0, 0x1000, (LPTHREAD_START_ROUTINE)pipeMain, 0, 0, NULL);
-	return 1;
-}
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
-{
-	switch (ul_reason_for_call)
-	{
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
+	switch (ul_reason_for_call) {
 	case DLL_PROCESS_ATTACH:
 		CreateThread(0, 0x1000, &mainMod, 0, 0, NULL);
 	case DLL_THREAD_ATTACH:
