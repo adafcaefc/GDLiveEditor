@@ -12,7 +12,7 @@
 
 ## Special thanks
 
-**[Camden314](https://github.com/camden314/)** for original GDLiveEditor on MACOSX
+**[Camila314](https://github.com/camila314/)** for original GDLiveEditor on MACOSX
 
 **[nekit](https://github.com/NeKitDS/)** for gd.py
 
